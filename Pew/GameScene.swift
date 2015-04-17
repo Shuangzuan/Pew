@@ -310,7 +310,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     private func setupSound() {
-         // SKTAudio.sharedInstance().playBackgroundMusic("SpaceGame.caf")
+        SKTAudio.sharedInstance().playBackgroundMusic("SpaceGame.caf")
     }
     
     private func setupStars() {
