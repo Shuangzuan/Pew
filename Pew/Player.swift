@@ -10,6 +10,8 @@ import SpriteKit
 
 class Player: Entity {
     
+    var invincible = false
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -48,7 +50,9 @@ class Player: Entity {
     
     private func contactObstacle(contact: SKPhysicsContact) {
         if let scene = scene as? GameScene {
-            takeHit()
+            if !invincible {
+                takeHit()
+            }
             
             if isDead() {
                 scene.spawnExplosionAtPosition(contact.contactPoint, scale: 1, large: true)
@@ -68,6 +72,10 @@ class Player: Entity {
             body.categoryBitMask == PhysicsCategory.AlienLaser ||
             body.categoryBitMask == PhysicsCategory.Alien {
             contactObstacle(contact)
+        } else if body.categoryBitMask == PhysicsCategory.Powerup {
+            if let scene = scene as? GameScene {
+                scene.applyPowerup()
+            }
         }
     }
 }

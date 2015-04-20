@@ -74,4 +74,8 @@ class Entity: SKSpriteNode {
             destroy()
         }
     }
+    
+    func update(dt: CFTimeInterval) {
+        
+    }
 }

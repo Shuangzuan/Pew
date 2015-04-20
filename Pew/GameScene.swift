@@ -19,6 +19,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     private var titleLabel1: SKLabelNode!
     private var titleLabel2: SKLabelNode!
     private var playLabel: SKLabelNode!
+    private var levelIntroLabel1: SKLabelNode!
+    private var levelIntroLabel2: SKLabelNode!
     
     // Sound
     private let soundExplosionLarge = SKAction.playSoundFileNamed("explosion_large.caf", waitForCompletion: false)
@@ -34,8 +36,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     // Level manager
     private let levelManager = LevelManager()
     private var okToRestart = false
-    private var timeSinceGameStarted: NSTimeInterval = 0
-    private var timeForGameWon: NSTimeInterval = 30
+    // private var timeSinceGameStarted: NSTimeInterval = 0
+    // private var timeForGameWon: NSTimeInterval = 30
     
     // Player
     private let player = Player()
@@ -59,6 +61,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     private var galaxy: SKSpriteNode!
     private var spatialanomaly: SKSpriteNode!
     private var spatialanomaly2: SKSpriteNode!
+    
+    // Alien
+    private var numAlienSpawns = 0
+    private var timeSinceLastAlienSpawn: NSTimeInterval = 0
+    private var timeForNextAlienSpawn: NSTimeInterval = 0
+    private var alienPath: UIBezierPath!
+    
+    // Powerup
+    private var timeSinceLastPowerup: NSTimeInterval = 0
+    private var timeForNextPowerup: NSTimeInterval = 0
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -131,10 +143,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         updatePlayer()
         updateAsteroids()
         
-        timeSinceGameStarted += deltaTime
-        if timeSinceGameStarted > timeForGameWon {
-            endScene(true)
-        }
+        // timeSinceGameStarted += deltaTime
+        // if timeSinceGameStarted > timeForGameWon {
+        //     endScene(true)
+        // }
+        
+        updateLevel()
+        updateAliens()
+        updateChildren()
+        updatePowerups()
     }
     
     // MARK: - Public methods
@@ -331,7 +348,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     private func setupPlayer() {
-        player.position = CGPoint(x: player.size.width/2, y: 0.5*size.height)
+        player.position = CGPoint(x: -player.size.width/2, y: 0.5*size.height)
         player.zPosition = 1
         player.name = "player"
         gameLayer.addChild(player)
@@ -378,6 +395,105 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         gameLayer.runAction(action)
     }
     
+    private func nextStage() {
+        levelManager.nextStage()
+        newStageStarted()
+    }
+    
+    private func newStageStarted() {
+        if levelManager.gameState == .Done {
+            endScene(true)
+        } else if let x = levelManager.boolForProp("SpawnLevelIntro") {
+            if x {
+                doLevelIntro()
+            }
+        }
+    }
+    
+    private func doLevelIntro() {
+        let fontName = "Avenir-Light"
+        
+        let message1 = "Level \(levelManager.curLevelIdx+1)"
+        let message2 = levelManager.stringForProp("LText")!
+        
+        // Level intro label 1
+        levelIntroLabel1 = SKLabelNode(fontNamed: fontName)
+        levelIntroLabel1.text = message1
+        levelIntroLabel1.fontSize = 48
+        levelIntroLabel1.fontColor = SKColor(red: 0.7, green: 0.7, blue: 0.7, alpha: 1)
+        levelIntroLabel1.position = CGPoint(x: size.width/2, y: 0.6*size.height)
+        levelIntroLabel1.verticalAlignmentMode = .Center
+        hudLayer.addChild(levelIntroLabel1)
+        
+        levelIntroLabel1.setScale(0)
+        let scaleUpAction1 = SKAction.scaleTo(1, duration: 0.5)
+        scaleUpAction1.timingMode = .EaseOut
+        let delayAction1 = SKAction.waitForDuration(3)
+        let scaleDownAction1 = SKAction.scaleTo(0, duration: 0.5)
+        scaleDownAction1.timingMode = .EaseOut
+        let removeAction = SKAction.removeFromParent()
+        let scaleUpDown = SKAction.sequence([
+            scaleUpAction1,
+            delayAction1,
+            scaleDownAction1,
+            removeAction
+        ])
+        levelIntroLabel1.runAction(scaleUpDown)
+        
+        // Level intro label 2
+        levelIntroLabel2 = SKLabelNode(fontNamed: fontName)
+        levelIntroLabel2.text = message2
+        levelIntroLabel2.fontSize = 48
+        levelIntroLabel2.fontColor = SKColor(red: 0.7, green: 0.7, blue: 0.7, alpha: 1)
+        levelIntroLabel2.position = CGPoint(x: size.width/2, y: 0.4*size.height)
+        levelIntroLabel2.verticalAlignmentMode = .Center
+        hudLayer.addChild(levelIntroLabel2)
+        
+        levelIntroLabel2.setScale(0)
+        levelIntroLabel2.runAction(scaleUpDown)
+    }
+    
+    func applyPowerup() {
+        runAction(soundPowerup)
+        
+        if let path = NSBundle.mainBundle().pathForResource("Boost", ofType: "sks") {
+            if let emitter = NSKeyedUnarchiver.unarchiveObjectWithFile(path) as? SKEmitterNode {
+                emitter.zPosition = -1
+                player.addChild(emitter)
+                
+                let scaleDuration = 1.0
+                let waitDuration = 5.0
+                
+                player.invincible = true
+                let moveForwardAction = SKAction.moveByX(0.6*size.width, y: 0, duration: scaleDuration)
+                let waitAction = SKAction.waitForDuration(waitDuration)
+                let moveBackAction = moveForwardAction.reversedAction()
+                let boostDoneAction = SKAction.runBlock {
+                    self.player.invincible = false
+                    emitter.removeFromParent()
+                }
+                player.runAction(SKAction.sequence([
+                    moveForwardAction,
+                    waitAction,
+                    moveBackAction,
+                    boostDoneAction
+                ]))
+                
+                let scale: CGFloat = 0.75
+                let diffX = (spacedust1.size.width - spacedust1.size.width * scale) / 2
+                let diffY = (spacedust1.size.height - spacedust1.size.height * scale) / 2
+                let moveOutAction = SKAction.moveByX(diffX, y: diffY, duration: scaleDuration)
+                let moveInAction = moveOutAction.reversedAction()
+                let scaleOutAction = SKAction.scaleTo(scale, duration: scaleDuration)
+                let scaleInAction = SKAction.scaleTo(1, duration: scaleDuration)
+                let outAction = SKAction.group([moveOutAction, scaleOutAction])
+                let inAction = SKAction.group([moveInAction, scaleInAction])
+                gameLayer.runAction(SKAction.sequence([outAction, waitAction, inAction]))
+            }
+        }
+
+    }
+    
     // MARK: Transitions
     
     private func startSpawn() {
@@ -392,6 +508,21 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 SKAction.removeFromParent()
             ]))
         }
+        
+        spawnPlayer()
+        
+        // timeSinceGameStarted = 0
+        // timeForGameWon = 30
+        
+        nextStage()
+    }
+    
+    private func spawnPlayer() {
+        let moveAction1 = SKAction.moveBy(CGVector(dx: player.size.width/2 + 0.3*size.width, dy: 0), duration: 0.5)
+        moveAction1.timingMode = .EaseOut
+        let moveAction2 = SKAction.moveBy(CGVector(dx: -0.2*size.width, dy: 0), duration: 0.5)
+        moveAction2.timingMode = .EaseOut
+        player.runAction(SKAction.sequence([moveAction1, moveAction2]))
     }
     
     // MARK: Update methods
@@ -413,7 +544,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             let accelY = CGFloat(Rolling.y)
             let accelZ = CGFloat(Rolling.z)
             
-            println("accelX: \(accelX), accelY: \(accelY), accelZ: \(accelZ)")
+            // println("accelX: \(accelX), accelY: \(accelY), accelZ: \(accelZ)")
             
             let kRestAccelX: CGFloat = 0.6
             let kPlayerMaxPointsPerSec = 0.5 * size.height
@@ -435,8 +566,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     private func updateAsteroids() {
-        let spawnSecsLow: NSTimeInterval = 0.2
-        let spawnSecsHigh: NSTimeInterval = 1.0
+        if let x = levelManager.boolForProp("SpawnAsteroids") {
+            
+        } else {
+            return
+        }
+        
+        let spawnSecsLow = NSTimeInterval(levelManager.floatForProp("ASpawnSecsLow")!)
+        let spawnSecsHigh = NSTimeInterval(levelManager.floatForProp("ASpawnSecsHigh")!)
         
         timeSinceLastAsteroidSpawn += deltaTime
         if timeSinceLastAsteroidSpawn > timeForNextAsteroidSpawn {
@@ -458,11 +595,60 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     
+    private func updateLevel() {
+        let newStage = levelManager.update()
+        if newStage {
+            newStageStarted()
+        }
+    }
+    
+    private func updateAliens() {
+        if let x = levelManager.boolForProp("SpawnAlienSwarm") {
+            if !x {
+                return
+            }
+        } else {
+            return
+        }
+        
+        timeSinceLastAlienSpawn += deltaTime
+        if timeSinceLastAlienSpawn > timeForNextAlienSpawn {
+            timeSinceLastAlienSpawn = 0
+            timeForNextAlienSpawn = 0.3
+            spawnAlien()
+        }
+    }
+    
+    private func updateChildren() {
+        for obj in gameLayer.children {
+            if let obj = obj as? Entity {
+                obj.update(deltaTime)
+            }
+        }
+    }
+    
+    private func updatePowerups() {
+        if let x = levelManager.boolForProp("SpawnPowerups") {
+            if !x {
+                return
+            }
+        } else {
+            return
+        }
+        
+        timeSinceLastPowerup += deltaTime
+        if timeSinceLastPowerup > timeForNextPowerup {
+            timeSinceLastPowerup = 0
+            timeForNextPowerup = NSTimeInterval(levelManager.floatForProp("PSpawnSecs")!)
+            spawnPowerup()
+        }
+    }
+    
     // MARK: Asteroids
     
     private func spawnAsteroid() {
-        let moveDurationLow: CGFloat = 2
-        let moveDurationHigh: CGFloat = 10
+        let moveDurationLow = CGFloat(levelManager.floatForProp("AMoveDurationLow")!)
+        let moveDurationHigh = CGFloat(levelManager.floatForProp("AMoveDurationHigh")!)
         
         let asteroid = Asteroid(asteroidType: AsteroidType(rawValue: arc4random_uniform(AsteroidType.NumAsteroidTypes.rawValue))!)
         asteroid.name = "asteroid"
@@ -473,6 +659,40 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             SKAction.moveBy(CGVector(dx: -1.5 * size.width, dy: 0), duration: Double(CGFloat.random(min: moveDurationLow, max: moveDurationHigh))),
             SKAction.removeFromParent()
         ]))
+    }
+    
+    // MARK: Aliens
+    
+    private func spawnAlien() {
+        if numAlienSpawns == 0 {
+            let alienPosStart = CGPoint(x: 1.3*size.width, y: CGFloat.random(min: 0.9*size.height, max: 1*size.height))
+            let cp1 = CGPoint(
+                x: CGFloat.random(min: -0.1*size.width, max: 0.6*size.height),
+                y: CGFloat.random(min: 0.7*size.height, max: 1*size.height)
+            )
+            
+            let alienPosEnd = CGPoint(x: 1.3*size.width, y: CGFloat.random(min: 0, max: 0.1*size.height))
+            let cp2 = CGPoint(
+                x: CGFloat.random(min: -0.1*size.width, max: 0.6*size.height),
+                y: CGFloat.random(min: 0, max: 0.3*size.height)
+            )
+            
+            alienPath = UIBezierPath()
+            alienPath.moveToPoint(alienPosStart)
+            alienPath.addCurveToPoint(alienPosEnd, controlPoint1: cp1, controlPoint2: cp2)
+            
+            numAlienSpawns = Int.random(min: 1, max: 20)
+            timeForNextAlienSpawn = 1
+        } else {
+            --numAlienSpawns
+            
+            let alien = Alien()
+            alien.name = "alien"
+            let pathAction = SKAction.followPath(alienPath.CGPath, asOffset: false, orientToPath: false, duration: 3)
+            let removeAction = SKAction.removeFromParent()
+            alien.runAction(SKAction.sequence([pathAction, removeAction]))
+            gameLayer.addChild(alien)
+        }
     }
     
     // MARK: Lasers and Cannons
@@ -491,6 +711,29 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         ]))
         
         runAction(soundLaserShip)
+    }
+    
+    func spawnAlienLaserAtPosition(position: CGPoint) {
+        let laser = AlienLaser()
+        laser.position = position
+        gameLayer.addChild(laser)
+        
+        let moveAction = SKAction.moveBy(CGVector(dx: -size.width, dy: 0), duration: 2)
+        let removeAction = SKAction.removeFromParent()
+        laser.runAction(SKAction.sequence([moveAction, removeAction]))
+        runAction(soundLaserEnemy)
+    }
+    
+    // MARK: Powerups
+    
+    private func spawnPowerup() {
+        let powerup = Powerup()
+        powerup.position = CGPoint(x: size.width, y: CGFloat.random(min: 0, max: size.height))
+        
+        let moveAction = SKAction.moveByX(-size.width, y: 0, duration: 5)
+        let removeAction = SKAction.removeFromParent()
+        powerup.runAction(SKAction.sequence([moveAction, removeAction]))
+        gameLayer.addChild(powerup)
     }
     
     // MARK: - Physics contact delegate
