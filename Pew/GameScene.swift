@@ -162,7 +162,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         myEmitter.position = position
         myEmitter.particleScale = scale
-        myEmitter.numParticlesToEmit *= Int(scale)
+        myEmitter.numParticlesToEmit = Int(CGFloat(myEmitter.numParticlesToEmit) * scale)
         myEmitter.particleLifetime /= scale
         myEmitter.particlePositionRange = CGVector(
             dx: myEmitter.particlePositionRange.dx * scale,
