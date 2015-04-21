@@ -18,7 +18,7 @@ class Alien: Entity {
     }
     
     init() {
-        super.init(imageNamed: "enemy_spaceship", maxHp: 1)
+        super.init(imageNamed: "enemy_spaceship", maxHp: 1, healthBarType: .Red)
         
         setupCollisionBody()
     }

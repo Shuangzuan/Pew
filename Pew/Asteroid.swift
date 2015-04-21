@@ -42,7 +42,7 @@ class Asteroid: Entity {
         }
         
         self.asteroidType = asteroidType
-        super.init(imageNamed: "asteroid", maxHp: maxHp)
+        super.init(imageNamed: "asteroid", maxHp: maxHp, healthBarType: .Red)
         
         setupCollisionBody()
         setScale(scale)

@@ -15,7 +15,7 @@ class PlayerLaser: Entity {
     }
     
     init() {
-        super.init(imageNamed: "laserbeam_blue", maxHp: 1)
+        super.init(imageNamed: "laserbeam_blue", maxHp: 1, healthBarType: .None)
         
         setupCollisionBody()
     }

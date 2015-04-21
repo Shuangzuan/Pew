@@ -17,21 +17,37 @@ struct PhysicsCategory {
     static let Powerup:     UInt32 = 0b100000
 }
 
+enum HealthBarType {
+    case None
+    case Green
+    case Red
+}
+
 class Entity: SKSpriteNode {
     
     var hp = 0
     var maxHp = 0
     
+    var healthBarType = HealthBarType.None
+    var healthBarBg: SKSpriteNode!
+    var healthBarProgress: SKSpriteNode!
+    var fullWidth: CGFloat = 0
+    var displayedWidth: CGFloat = 0
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    init(imageNamed name: String, maxHp: Int) {
+    init(imageNamed name: String, maxHp: Int, healthBarType: HealthBarType) {
         let texture = SKTexture(imageNamed: name)
+        
         super.init(texture: texture, color: nil, size: texture.size())
         
         self.maxHp = maxHp
         hp = maxHp
+        self.healthBarType = healthBarType
+        
+        setupHealthBar()
     }
     
     func moveToPoint(point: CGPoint, path: CGMutablePathRef, offset: CGPoint) {
@@ -76,6 +92,71 @@ class Entity: SKSpriteNode {
     }
     
     func update(dt: CFTimeInterval) {
+        if healthBarType == .None {
+            return
+        }
         
+        var percentage = CGFloat(hp) / CGFloat(maxHp)
+        percentage = min(percentage, 1)
+        percentage = max(percentage, 0)
+        
+        let desiredWidth = fullWidth * percentage
+        
+        let POINTS_PER_SEC: CGFloat = 50
+        if desiredWidth < displayedWidth {
+            displayedWidth = max(desiredWidth, displayedWidth - POINTS_PER_SEC * CGFloat(dt))
+        } else {
+            displayedWidth = min(desiredWidth, displayedWidth + POINTS_PER_SEC * CGFloat(dt))
+        }
+        
+        healthBarProgress.size = CGSize(width: displayedWidth, height: healthBarProgress.size.height)
+        
+        // Auto fading the health bar
+        if desiredWidth != displayedWidth {
+            for sprite in [healthBarBg, healthBarProgress] {
+                sprite.hidden = false
+                sprite.removeAllActions()
+                sprite.runAction(SKAction.sequence([
+                    SKAction.fadeInWithDuration(0.25),
+                    SKAction.waitForDuration(2),
+                    SKAction.fadeOutWithDuration(0.25),
+                    SKAction.runBlock {
+                        sprite.hidden = true
+                    }
+                ]))
+            }
+        }
+    }
+    
+    func setupHealthBar() {
+        if healthBarType == .None {
+            return
+        }
+        
+        healthBarBg = SKSpriteNode(imageNamed: "healthbar_bg")
+        healthBarBg.position = CGPoint(x: 0, y: 0.5*size.height)
+        addChild(healthBarBg)
+        
+        var progressSpriteName: String
+        if healthBarType == .Green {
+            progressSpriteName = "healthbar_green"
+        } else {
+            progressSpriteName = "healthbar_red"
+        }
+        
+        healthBarProgress = SKSpriteNode(imageNamed: progressSpriteName)
+        healthBarProgress.anchorPoint = CGPointZero
+        healthBarProgress.position = healthBarBg.position
+        healthBarProgress.position = CGPoint(
+            x: healthBarBg.position.x - healthBarProgress.size.width/2,
+            y: healthBarBg.position.y - healthBarProgress.size.height/2
+        )
+        addChild(healthBarProgress)
+        
+        fullWidth = healthBarBg.size.width
+        displayedWidth = fullWidth
+        
+        healthBarProgress.hidden = true
+        healthBarBg.hidden = true
     }
 }

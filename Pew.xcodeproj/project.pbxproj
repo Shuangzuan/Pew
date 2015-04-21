@@ -66,10 +66,12 @@
 		39158B251ADF5FCB00FA58EC /* LevelManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39158B241ADF5FCA00FA58EC /* LevelManager.swift */; };
 		39158B271ADF678800FA58EC /* Entity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39158B261ADF678800FA58EC /* Entity.swift */; };
 		39158B291ADF7C2900FA58EC /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39158B281ADF7C2900FA58EC /* Player.swift */; };
+		3935F3171AE61C1600C24798 /* Boss.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3935F3161AE61C1600C24798 /* Boss.swift */; };
+		3935F3191AE61D2800C24798 /* Levels.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3935F3181AE61D2800C24798 /* Levels.plist */; };
+		3935F31B1AE622BC00C24798 /* CannonBall.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3935F31A1AE622BC00C24798 /* CannonBall.swift */; };
 		393723D41AE4F20300DFBEE6 /* Alien.swift in Sources */ = {isa = PBXBuildFile; fileRef = 393723D31AE4F20300DFBEE6 /* Alien.swift */; };
 		393723D61AE4FAA200DFBEE6 /* AlienLaser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 393723D51AE4FAA200DFBEE6 /* AlienLaser.swift */; };
 		393723D81AE4FD5500DFBEE6 /* Powerup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 393723D71AE4FD5500DFBEE6 /* Powerup.swift */; };
-		393723DA1AE5006D00DFBEE6 /* Levels.plist in Resources */ = {isa = PBXBuildFile; fileRef = 393723D91AE5006D00DFBEE6 /* Levels.plist */; };
 		39B716671AE0A96E006848CA /* ParallaxNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39B716661AE0A96E006848CA /* ParallaxNode.swift */; };
 /* End PBXBuildFile section */
 
@@ -147,10 +149,12 @@
 		39158B241ADF5FCA00FA58EC /* LevelManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LevelManager.swift; sourceTree = "<group>"; };
 		39158B261ADF678800FA58EC /* Entity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Entity.swift; sourceTree = "<group>"; };
 		39158B281ADF7C2900FA58EC /* Player.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
+		3935F3161AE61C1600C24798 /* Boss.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Boss.swift; sourceTree = "<group>"; };
+		3935F3181AE61D2800C24798 /* Levels.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Levels.plist; sourceTree = "<group>"; };
+		3935F31A1AE622BC00C24798 /* CannonBall.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CannonBall.swift; sourceTree = "<group>"; };
 		393723D31AE4F20300DFBEE6 /* Alien.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Alien.swift; sourceTree = "<group>"; };
 		393723D51AE4FAA200DFBEE6 /* AlienLaser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlienLaser.swift; sourceTree = "<group>"; };
 		393723D71AE4FD5500DFBEE6 /* Powerup.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Powerup.swift; sourceTree = "<group>"; };
-		393723D91AE5006D00DFBEE6 /* Levels.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Levels.plist; sourceTree = "<group>"; };
 		39B716661AE0A96E006848CA /* ParallaxNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParallaxNode.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -199,15 +203,9 @@
 				39158A561ADF4BA300FA58EC /* GameScene.swift */,
 				39158A581ADF4BA300FA58EC /* GameViewController.swift */,
 				39158B241ADF5FCA00FA58EC /* LevelManager.swift */,
-				39158B261ADF678800FA58EC /* Entity.swift */,
-				39158B281ADF7C2900FA58EC /* Player.swift */,
-				390808D21ADFBD4600A51DAA /* PlayerLaser.swift */,
-				390808D01ADFB72A00A51DAA /* Asteroid.swift */,
-				393723D31AE4F20300DFBEE6 /* Alien.swift */,
-				393723D51AE4FAA200DFBEE6 /* AlienLaser.swift */,
 				39B716661AE0A96E006848CA /* ParallaxNode.swift */,
-				393723D71AE4FD5500DFBEE6 /* Powerup.swift */,
-				393723D91AE5006D00DFBEE6 /* Levels.plist */,
+				3935F3181AE61D2800C24798 /* Levels.plist */,
+				3935F3151AE61BBF00C24798 /* Entities */,
 				39158A5A1ADF4BA300FA58EC /* Main.storyboard */,
 				39158A5D1ADF4BA300FA58EC /* Images.xcassets */,
 				39158A5F1ADF4BA300FA58EC /* LaunchScreen.xib */,
@@ -326,6 +324,22 @@
 			path = SKTUtils;
 			sourceTree = "<group>";
 		};
+		3935F3151AE61BBF00C24798 /* Entities */ = {
+			isa = PBXGroup;
+			children = (
+				39158B261ADF678800FA58EC /* Entity.swift */,
+				39158B281ADF7C2900FA58EC /* Player.swift */,
+				390808D21ADFBD4600A51DAA /* PlayerLaser.swift */,
+				390808D01ADFB72A00A51DAA /* Asteroid.swift */,
+				393723D31AE4F20300DFBEE6 /* Alien.swift */,
+				393723D51AE4FAA200DFBEE6 /* AlienLaser.swift */,
+				393723D71AE4FD5500DFBEE6 /* Powerup.swift */,
+				3935F3161AE61C1600C24798 /* Boss.swift */,
+				3935F31A1AE622BC00C24798 /* CannonBall.swift */,
+			);
+			name = Entities;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -430,7 +444,7 @@
 				39158B051ADF557D00FA58EC /* laser_ship.caf in Resources */,
 				39158B071ADF557D00FA58EC /* shake.caf in Resources */,
 				39158ACB1ADF557D00FA58EC /* bg_planetsunrise.png in Resources */,
-				393723DA1AE5006D00DFBEE6 /* Levels.plist in Resources */,
+				3935F3191AE61D2800C24798 /* Levels.plist in Resources */,
 				39158AFE1ADF557D00FA58EC /* Stars2.sks in Resources */,
 				39158AD01ADF557D00FA58EC /* bg_spacialanomaly2.png in Resources */,
 				39158AF91ADF557D00FA58EC /* star3.png in Resources */,
@@ -480,7 +494,9 @@
 				393723D41AE4F20300DFBEE6 /* Alien.swift in Sources */,
 				39158B1B1ADF568600FA58EC /* Int+Extensions.swift in Sources */,
 				393723D61AE4FAA200DFBEE6 /* AlienLaser.swift in Sources */,
+				3935F31B1AE622BC00C24798 /* CannonBall.swift in Sources */,
 				39B716671AE0A96E006848CA /* ParallaxNode.swift in Sources */,
+				3935F3171AE61C1600C24798 /* Boss.swift in Sources */,
 				39158B1F1ADF568600FA58EC /* SKNode+Extensions.swift in Sources */,
 				39158B201ADF568600FA58EC /* SKTAudio.swift in Sources */,
 				39158B181ADF568600FA58EC /* CGFloat+Extensions.swift in Sources */,

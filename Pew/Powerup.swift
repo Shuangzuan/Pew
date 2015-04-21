@@ -15,7 +15,7 @@ class Powerup: Entity {
     }
     
     init() {
-        super.init(imageNamed: "powerup", maxHp: 1)
+        super.init(imageNamed: "powerup", maxHp: 1, healthBarType: .None)
         
         setupCollisionBody()
     }

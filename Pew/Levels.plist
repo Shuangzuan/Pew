@@ -3,8 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>Levels</key>
-	<array>
+	<array>		
 		<array>
+
 			<dict>
 				<key>Duration</key>
 				<integer>2</integer>
@@ -17,7 +18,7 @@
 				<key>SpawnAsteroids</key>
 				<true/>
 				<key>Duration</key>
-				<integer>5</integer>
+				<integer>15</integer>
 				<key>AMoveDurationHigh</key>
 				<integer>10</integer>
 				<key>AMoveDurationLow</key>
@@ -32,10 +33,10 @@
 				<true/>
 				<key>SpawnPowerups</key>
 				<true/>
-				<key>PSpawnSecs</key>
+                                <key>PSpawnSecs</key>
 				<integer>10</integer>
 				<key>Duration</key>
-				<integer>5</integer>
+				<integer>10</integer>
 				<key>AMoveDurationHigh</key>
 				<integer>3</integer>
 				<key>AMoveDurationLow</key>
@@ -49,7 +50,7 @@
 				<key>SpawnAsteroids</key>
 				<true/>
 				<key>Duration</key>
-				<integer>5</integer>
+				<integer>15</integer>
 				<key>AMoveDurationHigh</key>
 				<integer>7</integer>
 				<key>AMoveDurationLow</key>
@@ -78,7 +79,7 @@
 				<true/>
 				<key>SpawnPowerups</key>
 				<true/>
-				<key>PSpawnSecs</key>
+                                <key>PSpawnSecs</key>
 				<integer>20</integer>
 				<key>AMoveDurationHigh</key>
 				<integer>10</integer>
@@ -88,6 +89,22 @@
 				<integer>3</integer>
 				<key>ASpawnSecsLow</key>
 				<integer>1</integer>
+			</dict>
+		</array>
+		<array>
+			<dict>
+				<key>SpawnLevelIntro</key>
+				<true/>
+				<key>Duration</key>
+				<integer>2</integer>
+				<key>LText</key>
+				<string>Dark Onslaught</string>
+			</dict>
+			<dict>
+				<key>SpawnBoss</key>
+				<true/>
+				<key>Duration</key>
+				<integer>-1</integer>
 			</dict>
 		</array>
 	</array>

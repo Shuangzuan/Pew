@@ -17,7 +17,7 @@ class Player: Entity {
     }
 
     init() {
-        super.init(imageNamed: "SpaceFlier_sm_1", maxHp: 10)
+        super.init(imageNamed: "SpaceFlier_sm_1", maxHp: 10, healthBarType: .Green)
         
         setupAnimation()
         setupCollisionBody()

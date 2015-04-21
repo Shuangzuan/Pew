@@ -40,7 +40,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     // private var timeForGameWon: NSTimeInterval = 30
     
     // Player
-    private let player = Player()
+    let player = Player()
     
     // Motion
     private let motionManager = CMMotionManager()
@@ -71,6 +71,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     // Powerup
     private var timeSinceLastPowerup: NSTimeInterval = 0
     private var timeForNextPowerup: NSTimeInterval = 0
+    
+    // Boss
+    private var boss: Boss!
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -395,7 +398,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         gameLayer.runAction(action)
     }
     
-    private func nextStage() {
+    func nextStage() {
         levelManager.nextStage()
         newStageStarted()
     }
@@ -407,6 +410,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             if x {
                 doLevelIntro()
             }
+        } else if levelManager.hasProp("SpawnBoss") {
+            spawnBoss()
         }
     }
     
@@ -725,6 +730,21 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         runAction(soundLaserEnemy)
     }
     
+    func shootCannonBallAtPlayerFromPosition(position: CGPoint) {
+        let cannonBall = CannonBall()
+        cannonBall.position = position
+        gameLayer.addChild(cannonBall)
+        
+        let offset = player.position - cannonBall.position
+        let shootVector = offset.normalized()
+        let shootTarget = shootVector * (2*size.width)
+        
+        cannonBall.runAction(SKAction.sequence([
+            SKAction.moveByX(shootTarget.x, y: shootTarget.y, duration: 5),
+            SKAction.removeFromParent()
+        ]))
+    }
+    
     // MARK: Powerups
     
     private func spawnPowerup() {
@@ -735,6 +755,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let removeAction = SKAction.removeFromParent()
         powerup.runAction(SKAction.sequence([moveAction, removeAction]))
         gameLayer.addChild(powerup)
+    }
+    
+    // MARK: Boss
+    
+    private func spawnBoss() {
+        boss = Boss()
+        boss.position = CGPoint(x: 1.2*size.width, y: 1.2*size.height)
+        gameLayer.addChild(boss)
+        
+        shakeScreen(100)
+        runAction(soundBoss)
     }
     
     // MARK: - Physics contact delegate
