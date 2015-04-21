@@ -479,7 +479,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     boostDoneAction
                 ]))
                 
-                let scale: CGFloat = 0.75
+                let scale: CGFloat = 0.9 // 0.75
+                
                 let diffX = (spacedust1.size.width - spacedust1.size.width * scale) / 2
                 let diffY = (spacedust1.size.height - spacedust1.size.height * scale) / 2
                 let moveOutAction = SKAction.moveByX(diffX, y: diffY, duration: scaleDuration)
